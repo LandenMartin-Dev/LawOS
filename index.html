@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hello, World!</title>
+<style>
+  /* Grab the classic DOS VGA font so it looks authentic */
+  @import url('https://fonts.cdnfonts.com/css/perfect-dos-vga-437');
+
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #000;
+  }
+
+  /* Keep everything black while the font downloads */
+  #screen {
+    padding: 20px;
+    font-family: 'Perfect DOS VGA 437', 'Courier New', Courier, monospace;
+    font-size: 42px; 
+    line-height: 1.2;
+    color: #a5a5a5; 
+    white-space: pre;
+    overflow: hidden;
+    
+    /* Turn off anti-aliasing to keep it looking like an old bitmap font */
+    -webkit-font-smoothing: none;
+    font-smooth: never;
+    
+    /* Tiny blur to mimic an old CRT monitor */
+    filter: blur(0.6px);
+    letter-spacing: 1px;
+
+    visibility: hidden; 
+    opacity: 0;
+  }
+
+  /* Flip the visibility once the JS says the font is ready */
+  body.loaded #screen {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .cursor {
+    display: inline-block;
+    /* Make the cursor a flat underscore */
+    width: 0.5em;       
+    height: 0.08em;     
+    margin-left: 2px;
+    background: #a5a5a5;
+    animation: blink 1s steps(1) infinite;
+    filter: blur(0px);  /* Keep this sharp */
+    
+    vertical-align: baseline;
+    position: relative;
+    bottom: -0.1em;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+  <div id="screen">Hello, World!<span class="cursor"></span></div>
+
+  <script>
+    // Hold the black screen until the font is actually loaded and ready to draw
+    document.fonts.ready.then(function() {
+      document.body.classList.add('loaded');
+    });
+  </script>
+</body>
+</html>
