@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Hello, World!</title>
+<title>LawOS</title>
 <style>
-  /* Grab the classic DOS VGA font so it looks authentic */
+  /* Load the classic DOS font */
   @import url('https://fonts.cdnfonts.com/css/perfect-dos-vga-437');
 
   html, body {
@@ -13,29 +13,24 @@
     background: #000;
   }
 
-  /* Keep everything black while the font downloads */
+  /* Hide screen while the font loads to avoid a text flash */
   #screen {
     padding: 20px;
     font-family: 'Perfect DOS VGA 437', 'Courier New', Courier, monospace;
-    font-size: 42px; 
+    font-size: 24px; 
     line-height: 1.2;
     color: #a5a5a5; 
-    white-space: pre;
     overflow: hidden;
     
-    /* Turn off anti-aliasing to keep it looking like an old bitmap font */
+    /* Kill anti-aliasing for that crisp bitmap look */
     -webkit-font-smoothing: none;
     font-smooth: never;
-    
-    /* Tiny blur to mimic an old CRT monitor */
-    filter: blur(0.6px);
     letter-spacing: 1px;
-
     visibility: hidden; 
     opacity: 0;
   }
 
-  /* Flip the visibility once the JS says the font is ready */
+  /* Reveal once the font is ready */
   body.loaded #screen {
     visibility: visible;
     opacity: 1;
@@ -43,13 +38,15 @@
 
   .cursor {
     display: inline-block;
-    /* Make the cursor a flat underscore */
+    /* Underscore cursor style */
     width: 0.5em;       
     height: 0.08em;     
     margin-left: 2px;
     background: #a5a5a5;
     animation: blink 1s steps(1) infinite;
-    filter: blur(0px);  /* Keep this sharp */
+    
+    /* Keep cursor sharp while the rest is slightly blurred */
+    filter: blur(0px);  
     
     vertical-align: baseline;
     position: relative;
@@ -62,12 +59,48 @@
 </style>
 </head>
 <body>
-  <div id="screen">Hello, World!<span class="cursor"></span></div>
+  <!-- All on one line to stop weird spacing issues -->
+  <div id="screen"><span id="history">Welcome to LawOS!<br></span><span>&gt;&gt;&gt; </span><span id="current-input"></span><span class="cursor"></span></div>
 
   <script>
-    // Hold the black screen until the font is actually loaded and ready to draw
+    // Wait for font to load before showing the terminal
     document.fonts.ready.then(function() {
       document.body.classList.add('loaded');
+    });
+
+    const historyEl = document.getElementById('history');
+    const inputEl = document.getElementById('current-input');
+    
+    let currentText = '';
+
+    // Handle keyboard input
+    document.addEventListener('keydown', function(e) {
+      // Append normal characters (max 32 chars)
+      if (e.key.length === 1) {
+        if (currentText.length < 32) {
+          currentText += e.key;
+          inputEl.textContent = currentText;
+        }
+        e.preventDefault();
+      } 
+      // Backspace logic
+      else if (e.key === 'Backspace') {
+        currentText = currentText.slice(0, -1);
+        inputEl.textContent = currentText;
+        e.preventDefault();
+      } 
+      // Enter logic
+      else if (e.key === 'Enter') {
+        if (currentText.length > 0) {
+          // Echo the input and add a blank line
+          historyEl.innerHTML += `&gt;&gt;&gt; ${currentText}<br>${currentText}<br><br>`;
+          
+          // Reset the input
+          currentText = '';
+          inputEl.textContent = '';
+        }
+        e.preventDefault();
+      }
     });
   </script>
 </body>
